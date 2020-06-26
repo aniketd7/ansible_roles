@@ -1,0 +1,62 @@
+---
+          - name: Creating virtual dir for deb based servers
+            template:
+                    src:
+                            deb_virtualhost.j2
+                    dest:
+                            "/etc/apache2/sites-available/{{ domain_name }}.conf"
+            notify:
+                    restart-apache2
+            when:
+                    ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+
+          - name: Creating virtual dir for rpm based servers
+            template:
+                    src:
+                            rpm_virtualhost.j2
+                    dest:
+                            "/etc/httpd/conf.d/{{ domain_name }}.conf"
+            notify:
+                    restart-httpd
+            when:
+                    ansible_distribution == 'Centos' or ansible_distribution == 'Redhat' or ansible_distribution == 'Amazon Linux'
+
+                  
+          - name: Enable conf file in deb based servers
+            shell:
+                    cmd: a2ensite aniket.in.conf
+                        
+            notify:
+                    restart-apache2
+            when:
+                    ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+          - name: Creating document root for deb
+            file:
+                    path: /var/www/html/{{ domain_name }}
+                    state: directory
+                    owner: www-data
+                    group: www-data
+            when:
+                    ansible_distribution  == 'Ubuntu' or ansible_distribution == 'Debian'
+
+          - name: Creating document root for rpm
+            file:
+                    path: /var/www/html/{{ domain_name }}
+                    state: directory
+                    owner: apache
+                    owner: apache
+            when:
+                     ansible_distribution == 'Centos' or ansible_distribution == 'Redhat' or ansible_distribution == 'Amazon Linux'
+
+          - name: Copy files to document root
+            copy:
+                    src: "{{item}}"
+
+                    dest:
+                            /var/www/html/{{ domain_name }}
+            with_items:
+                    - index.html
+                    - aniket.html
+

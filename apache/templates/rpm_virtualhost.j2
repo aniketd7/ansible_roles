@@ -1,0 +1,6 @@
+<Virtualhost *:80>
+	ServerName {{ domain_name }}
+	ServerAlias www.{{ domain_name }}
+	DocumentRoot /var/www/html/{{ domain_name }}
+	DirectoryIndex index.html aniket.html
+</Virtualhost>
